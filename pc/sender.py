@@ -39,7 +39,7 @@ def print_time_stat (start_time, end_time, chunk_size):
 	return time_taken
 
 # Sends a chunk to the serial device and returns the time taken
-def send_data (chunk):
+def send_data (arduino_connection, chunk):
 	start_time = time.time()
 	arduino_connection.write(chunk)
 	end_time = time.time()
@@ -47,7 +47,7 @@ def send_data (chunk):
 	return time_taken
 
 # Receives a chunk of chunk_size and returns the time taken and contents of the chunk
-def receive_chunk (chunk_size):
+def receive_chunk (arduino_connection, chunk_size):
 	start_time = time.time()
 	iteration_response = arduino_connection.read(size=chunk_size).decode()
 	end_time = time.time()
@@ -94,15 +94,15 @@ print ("done.")
 
 # Send data
 data_to_send = text_to_send.encode()
-data_to_send = [data_to_send[i:i+bytes_per_update] for i in range(0, len(data_to_send), bytes_per_update)]
+chunks_to_send = [data_to_send[i:i+bytes_per_update] for i in range(0, len(data_to_send), bytes_per_update)]
 
 total_time = 0
 print ("Sending data... ")
-for chunk in data_to_send:
-	time_taken = send_data(chunk)
+for chunk in chunks_to_send:
+	time_taken = send_data(arduino_connection, chunk)
 	total_time += time_taken
 print ("\ndone.")
-print (f"Average read speed: {len(text_to_send)*8.0/total_time} bits/second\n")
+print (f"Average write speed: {len(data_to_send)*8.0/total_time} bits/second\n")
 
 
 
@@ -115,12 +115,12 @@ total_time = 0
 print ("Receiving data... ")
 for i in range(0, len(text_to_send), bytes_per_update):
 	current_chunk_size = min(len(text_to_send), i+bytes_per_update)-i
-	time_taken, iteration_response = receive_chunk(current_chunk_size)
+	time_taken, iteration_response = receive_chunk(arduino_connection, current_chunk_size)
 	total_time += time_taken
 	response += iteration_response
 
 print ("\ndone.")
-print (f"Average write speed: {len(text_to_send)*8.0/total_time} bits/second\n")
+print (f"Average read speed: {len(response)*8.0/total_time} bits/second\n")
 
 
 
