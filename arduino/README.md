@@ -34,7 +34,7 @@ These instructions are written for Ubuntu 20.04 LTS, however they may be adaptab
 ```bash
 # Clone the Git repo
 git clone https://github.com/ryuukumar/nymble-task
-cd nymble-task
+cd nymble-task/arduino
 
 # Download requirements
 sudo apt install gcc-avr avr-libc avrdude
